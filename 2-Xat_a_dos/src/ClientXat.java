@@ -54,10 +54,8 @@ public class ClientXat {
                     break;
                 }
             }
-
             lector.join();
             client.tancarClient();
-
         } catch (IOException | InterruptedException e) {
             System.out.println("Error: " + e.getMessage());
         } finally {
