@@ -13,11 +13,12 @@ public class ServidorXat {
     public void servidorAEscoltar() {
         try {
             serverSocket = new ServerSocket(PORT, 0, InetAddress.getByName(HOST));
-            System.out.println("Servidor iniciado en " + HOST + ":" + PORT);
+            System.out.println("Servidor iniciat a localhost:9999");
+
             while (!sortir) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connectat: " + socket.getInetAddress());
-    
+
                 GestorClients gc = new GestorClients(socket, this);
                 gc.start();
             }
@@ -38,38 +39,41 @@ public class ServidorXat {
         }
     }
 
+    public synchronized void afegirClient(GestorClients client) {
+    String nom = client.getNom();
+    clients.put(nom, client);
+    System.out.println(nom + " connectat.");
+    enviarMissatgeGrup(Missatge.getMissatgeGrup("Entra: " + nom)); // ✅ CORREGIDO
+    }
+
+    public synchronized void enviarMissatgeGrup(String missatge) {
+        String codificat = Missatge.getMissatgeGrup(missatge); // ✅ CORREGIDO
+        System.out.println("DEBUG: multicast " + missatge);
+        for (GestorClients client : clients.values()) {
+            client.enviarMissatge(codificat);
+        }
+    }
+
     public void finalitzarXat() {
-        enviarMissatgeGrup(MSG_SORTIR);
+        enviarMissatgeGrup(Missatge.getMissatgeGrup(MSG_SORTIR)); // ✅ CORREGIDO
         clients.clear();
         sortir = true;
         pararServidor();
+        System.exit(0);
     }
 
-    public synchronized void afegirClient(GestorClients client) {
-        String nom = client.getNom();
-        clients.put(nom, client);
-        enviarMissatgeGrup("Entra: " + nom);
-    }
 
     public synchronized void eliminarClient(String nom) {
         if (clients.containsKey(nom)) {
             clients.remove(nom);
-            System.out.println("DEBUG: Cliente eliminado: " + nom);
-        }
-    }
-
-    public synchronized void enviarMissatgeGrup(String missatge) {
-        System.out.println("DEBUG: multicast " + missatge);
-        for (GestorClients client : clients.values()) {
-            client.enviarMissatge("servidor", missatge);
         }
     }
 
     public synchronized void enviarMissatgePersonal(String remitent, String destinatari, String missatge) {
         GestorClients client = clients.get(destinatari);
         if (client != null) {
-            String missatgeCodificat = Missatge.getMissatgePersonal(destinatari, remitent + "#" + missatge);
-            client.enviarMissatge(remitent, missatgeCodificat);
+            String codificat = Missatge.getMissatgePersonal(destinatari, missatge);
+            client.enviarMissatge(codificat);
         }
     }
 

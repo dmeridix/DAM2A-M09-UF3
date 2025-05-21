@@ -5,9 +5,8 @@ public class Missatge {
     public static final String CODI_MSG_GRUP = "1002";
     public static final String CODI_SORTIR_CLIENT = "1003";
 
-    // Métodos para formar los mensajes codificados
-    public static String getMissatgePersonal(String destinatari, String missatge) {
-        return CODI_MSG_PERSONAL + "#" + destinatari + "#" + missatge;
+    public static String getMissatgePersonal(String remitent, String missatge) {
+        return CODI_MSG_PERSONAL + "#" + remitent + "#" + missatge;
     }
 
     public static String getMissatgeGrup(String missatge) {
@@ -26,19 +25,17 @@ public class Missatge {
         return CODI_SORTIR_TOTS + "#" + missatge;
     }
 
-    
     public static String getCodiMissatge(String missatgeRaw) {
         if (missatgeRaw == null || missatgeRaw.trim().isEmpty() || !missatgeRaw.contains("#")) {
-            System.out.println("WARN: mensaje vacío o incorrecto");
+            System.out.println("WARN: missatge buit o incorrecte");
             return null;
         }
         return missatgeRaw.split("#")[0];
     }
 
-    
     public static String[] getPartsMissatge(String missatgeRaw) {
         if (missatgeRaw == null || missatgeRaw.trim().isEmpty() || !missatgeRaw.contains("#")) {
-            System.out.println("WARN: mensaje vacío o incorrecto");
+            System.out.println("WARN: missatge buit o incorrecte");
             return null;
         }
         return missatgeRaw.split("#");

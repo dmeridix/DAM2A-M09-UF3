@@ -31,7 +31,7 @@ public class GestorClients extends Thread {
                 processaMissatge(missatgeCru);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Error rebent missatge.");
         } finally {
             try {
                 clientSocket.close();
@@ -41,12 +41,12 @@ public class GestorClients extends Thread {
         }
     }
 
-    public void enviarMissatge(String remitent, String missatge) {
+    public void enviarMissatge(String missatge) {
         try {
             oos.writeObject(missatge);
             oos.flush();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Flux tancat. No s'ha pogut enviar el missatge.");
         }
     }
 
@@ -70,22 +70,21 @@ public class GestorClients extends Thread {
 
             case Missatge.CODI_SORTIR_TOTS:
                 servidor.finalitzarXat();
+                sortir = true;
                 break;
 
-                case Missatge.CODI_MSG_PERSONAL:
+            case Missatge.CODI_MSG_PERSONAL:
                 parts = Missatge.getPartsMissatge(missatgeCru);
                 if (parts.length >= 3) {
-                    String remitent = parts[0];
                     String destinatari = parts[1];
-                    String missatge = parts[2];
-            
-                    System.out.printf("Missatge personal per(%s) de(%s): %s%n",
-                            destinatari, remitent, missatge);
+                    String contingut = parts[2];
+                    System.out.printf("Missatge personal per(%s) de(%s): %s%n", destinatari, this.nom, contingut);
+                    servidor.enviarMissatgePersonal(this.nom, destinatari, contingut); // ✅ LÍNEA CLAVE
                 }
                 break;
 
             default:
-                System.out.println("Código desconocido: " + codi);
+                System.out.println("Codi desconegut: " + codi);
         }
     }
 }
